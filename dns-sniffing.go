@@ -1,6 +1,7 @@
 package main
 
 import (
+	"flag"
 	"fmt"
 	"log"
 	"strings"
@@ -11,7 +12,10 @@ import (
 )
 
 func main() {
-	device := "eth0" // Change to your actual network interface (e.g., wlan0, en0)
+	var device string
+	flag.StringVar(&device, "face", "eth0", "specify the device like wla0,eth0 ...")
+	flag.Parse()
+
 	snapshotLen := int32(1024)
 	promiscuous := true
 	timeout := pcap.BlockForever
@@ -22,7 +26,8 @@ func main() {
 	}
 	defer handle.Close()
 
-	// Filter for DNS traffic only
+	//TODO:  implmnt diff protocols.
+
 	var filter = "udp and port 53"
 	err = handle.SetBPFFilter(filter)
 	if err != nil {
