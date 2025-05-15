@@ -13,7 +13,7 @@ import (
 
 func main() {
 	var device string
-	flag.StringVar(&device, "face", "eth0", "specify the device like wla0,eth0 ...")
+	flag.StringVar(&device, "iface", "eth0", "specify the device like wla0,eth0 ...")
 	flag.Parse()
 
 	snapshotLen := int32(1024)

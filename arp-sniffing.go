@@ -12,7 +12,7 @@ import (
 
 func main() {
 	var device string
-	flag.StringVar(&device, "face", "eth0", "specify the device like wla0,eth0 ...")
+	flag.StringVar(&device, "iface", "eth0", "specify the device like wla0,eth0 ...")
 	flag.Parse()
 
 	snapshotLen := int32(1024)
@@ -39,7 +39,8 @@ func main() {
 		if netLayer := packet.NetworkLayer(); netLayer != nil {
 			src, dst := netLayer.NetworkFlow().Endpoints()
 			if ip := net.ParseIP(dst.String()); ip != nil {
-				fmt.Println("Outgoing IP: %s | From : %s", dst, src)
+
+				fmt.Printf("Outgoing IP: %s | From : %s\n", dst.String(), src.String())
 			}
 		}
 	}
